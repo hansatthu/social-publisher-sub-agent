@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Agent } from '@mastra/core/agent';
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI, openai } from '@ai-sdk/openai';
 import { Memory } from '@mastra/memory';
 import { pStore } from '@gitroom/nestjs-libraries/chat/mastra.store';
 import { array, object, string } from 'zod';
@@ -42,6 +42,12 @@ export class LoadToolsService {
 
   async agent() {
     const tools = await this.loadTools();
+    const isDeepseek = !!process.env.DEEPSEEK_API_KEY;
+    const aiProvider = isDeepseek ? createOpenAI({
+      baseURL: 'https://api.deepseek.com/v1',
+      apiKey: process.env.DEEPSEEK_API_KEY,
+    }) : openai;
+
     return new Agent({
       id: 'postiz',
       name: 'postiz',
@@ -87,7 +93,7 @@ export class LoadToolsService {
       )}
 `;
       },
-      model: openai('gpt-5.2'),
+      model: aiProvider(isDeepseek ? 'deepseek-chat' : 'gpt-4o'),
       tools,
       memory: new Memory({
         storage: pStore,

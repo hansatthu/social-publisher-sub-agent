@@ -34,7 +34,7 @@ export class DeepSeekProvider implements AIProvider {
       });
 
       return response.choices.map((choice) => choice.message.content || '');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error generating text with DeepSeek: ${error.message}`);
       throw error;
     }

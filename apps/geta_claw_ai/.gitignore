@@ -1,0 +1,38 @@
+# Environments
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/out/
+frontend/.next/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.venv/
+
+# Docker
+docker-compose.override.yml
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Database & Storage
+*.sqlite3
+*.duckdb
+pg_data/
+redis_data/
+ollama_storage/
+.ollama/

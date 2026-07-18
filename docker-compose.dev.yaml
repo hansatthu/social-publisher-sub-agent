@@ -34,7 +34,7 @@ services:
     container_name: postiz-pg-admin
     restart: always
     ports:
-      - 8081:80
+      - 8082:80
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -135,9 +135,29 @@ services:
     ports:
       - "8080:8080"
 
+  local-ollama-engine:
+    image: ollama/ollama
+    container_name: local_ollama_engine
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ollama_storage:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - postiz-network
+
 volumes:
   redisinsight:
   postgres-volume:
+    external: false
+  ollama_storage:
     external: false
 
 networks:

@@ -79,8 +79,10 @@ export class PublishingAgentService {
         posts: [
           {
             integration: { id: destId },
+            group: '',
             value: [
               {
+                id: '',
                 content: content,
                 image: images.map(img => ({ path: img, id: '' })),
                 delay: 0

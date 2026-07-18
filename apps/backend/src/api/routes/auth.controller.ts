@@ -109,6 +109,7 @@ export class AuthController {
         register: true,
       });
     } catch (e: any) {
+      console.error("REGISTER ERROR DUMP:", e.message, JSON.stringify(e));
       response.status(400).send(e.message);
     }
   }

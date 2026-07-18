@@ -1,3 +1,4 @@
+import OpenAI from 'openai';
 import {
   Logger,
   Controller,
@@ -39,18 +40,21 @@ export class CopilotController {
   @Post('/chat')
   chatAgent(@Req() req: Request, @Res() res: Response) {
     if (
-      process.env.OPENAI_API_KEY === undefined ||
-      process.env.OPENAI_API_KEY === ''
+      !process.env.OPENAI_API_KEY && !process.env.DEEPSEEK_API_KEY
     ) {
-      Logger.warn('OpenAI API key not set, chat functionality will not work');
+      Logger.warn('AI API key not set, chat functionality will not work');
       return;
     }
+
+    const isDeepseek = !!process.env.DEEPSEEK_API_KEY;
+    const openaiInstance = isDeepseek ? new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com/v1' }) : undefined;
 
     const copilotRuntimeHandler = copilotRuntimeNodeHttpEndpoint({
       endpoint: '/copilot/chat',
       runtime: new CopilotRuntime(),
       serviceAdapter: new OpenAIAdapter({
-        model: 'gpt-4.1',
+        openai: openaiInstance as any,
+        model: isDeepseek ? 'deepseek-chat' : 'gpt-4o',
       }),
     });
 
@@ -65,10 +69,9 @@ export class CopilotController {
     @GetOrgFromRequest() organization: Organization
   ) {
     if (
-      process.env.OPENAI_API_KEY === undefined ||
-      process.env.OPENAI_API_KEY === ''
+      !process.env.OPENAI_API_KEY && !process.env.DEEPSEEK_API_KEY
     ) {
-      Logger.warn('OpenAI API key not set, chat functionality will not work');
+      Logger.warn('AI API key not set, chat functionality will not work');
       return;
     }
     const mastra = await this._mastraService.mastra();
@@ -91,12 +94,16 @@ export class CopilotController {
       agents,
     });
 
+    const isDeepseek = !!process.env.DEEPSEEK_API_KEY;
+    const openaiInstance = isDeepseek ? new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com/v1' }) : undefined;
+
     const copilotRuntimeHandler = copilotRuntimeNextJSAppRouterEndpoint({
       endpoint: '/copilot/agent',
       runtime,
       // properties: req.body.variables.properties,
       serviceAdapter: new OpenAIAdapter({
-        model: 'gpt-4.1',
+        openai: openaiInstance as any,
+        model: isDeepseek ? 'deepseek-chat' : 'gpt-4o',
       }),
     });
 

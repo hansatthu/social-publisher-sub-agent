@@ -44,8 +44,8 @@ services:
       BEEHIIVE_PUBLICATION_ID: ''
       THREADS_APP_ID: ''
       THREADS_APP_SECRET: ''
-      FACEBOOK_APP_ID: ''
-      FACEBOOK_APP_SECRET: ''
+      FACEBOOK_APP_ID: '1005480258528617'
+      FACEBOOK_APP_SECRET: '0a08b6f60b812b225f949276e86f25f0'
       YOUTUBE_CLIENT_ID: ''
       YOUTUBE_CLIENT_SECRET: ''
       TIKTOK_CLIENT_ID: ''
@@ -85,7 +85,7 @@ services:
 
       # === Misc Settings
       OPENAI_API_KEY: ''
-      DEEPSEEK_API_KEY: ''
+      DEEPSEEK_API_KEY: '${DEEPSEEK_API_KEY}'
       PUBLISH_DELAY_SECONDS: '300'
       DEFAULT_AI_PROVIDER: 'deepseek'
       DEFAULT_IMAGE_PROVIDER: 'openai'
