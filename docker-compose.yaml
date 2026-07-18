@@ -85,6 +85,10 @@ services:
 
       # === Misc Settings
       OPENAI_API_KEY: ''
+      DEEPSEEK_API_KEY: ''
+      PUBLISH_DELAY_SECONDS: '300'
+      DEFAULT_AI_PROVIDER: 'deepseek'
+      DEFAULT_IMAGE_PROVIDER: 'openai'
       NEXT_PUBLIC_DISCORD_SUPPORT: ''
       NEXT_PUBLIC_POLOTNO: ''
       API_LIMIT: 30
