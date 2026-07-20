@@ -1,10 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts", "**/.next", "**/.venv"],
+  "include": ["src/**/*"],
   "compilerOptions": {
     "module": "CommonJS",
     "resolveJsonModule": true,
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

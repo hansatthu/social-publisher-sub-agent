@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { initializeSentry } from '@gitroom/nestjs-libraries/sentry/initialize.sentry';
 initializeSentry('backend', true);
 import compression from 'compression';
@@ -5,7 +6,7 @@ import compression from 'compression';
 import { loadSwagger } from '@gitroom/helpers/swagger/load.swagger';
 import { json } from 'express';
 import { Runtime } from '@temporalio/worker';
-// Runtime.install({ shutdownSignals: [] });
+Runtime.install({ shutdownSignals: [] });
 
 process.env.TZ = 'UTC';
 
@@ -71,7 +72,7 @@ async function start() {
   const port = process.env.PORT || 3000;
 
   try {
-    await app.listen(port);
+    await app.listen(port, '0.0.0.0');
     console.log('Backend started successfully on port ' + port);
 
     checkConfiguration(); // Do this last, so that users will see obvious issues at the end of the startup log without having to scroll up.

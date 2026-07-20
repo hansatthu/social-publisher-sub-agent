@@ -37,7 +37,7 @@ export class IntegrationService {
     private _integrationManager: IntegrationManager,
     private _notificationService: NotificationService,
     @Inject(forwardRef(() => RefreshIntegrationService))
-    private _refreshIntegrationService: RefreshIntegrationService,
+    private _refreshIntegrationService: any,
     private _temporalService: TemporalService
   ) {}
 

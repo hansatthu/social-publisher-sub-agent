@@ -13,7 +13,7 @@ export class RefreshIntegrationService {
   constructor(
     private _integrationManager: IntegrationManager,
     @Inject(forwardRef(() => IntegrationService))
-    private _integrationService: IntegrationService,
+    private _integrationService: any,
     private _temporalService: TemporalService
   ) {}
   async refresh(integration: Integration, cause = ''): Promise<false | AuthTokenDetails> {

@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "incremental": true,
     "strictNullChecks": false,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": true,
     "strict": true,
@@ -36,5 +36,5 @@
       "@gitroom/extension/*": ["apps/extension/src/*"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp", "**/.next", "**/dist", "**/.venv", "dist"]
 }

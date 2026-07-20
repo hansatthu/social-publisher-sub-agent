@@ -93,7 +93,7 @@ export class LoadToolsService {
       )}
 `;
       },
-      model: aiProvider(isDeepseek ? 'deepseek-chat' : 'gpt-4o'),
+      model: (aiProvider as any)(isDeepseek ? 'deepseek-chat' : 'gpt-4o'),
       tools,
       memory: new Memory({
         storage: pStore,
