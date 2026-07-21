@@ -10,7 +10,7 @@ export class DeepSeekProvider implements AIProvider {
   constructor() {
     this.openai = new OpenAI({
       apiKey: process.env.DEEPSEEK_API_KEY || '',
-      baseURL: 'https://api.deepseek.com',
+      baseURL: 'https://api.deepseek.com/v1',
     });
   }
 

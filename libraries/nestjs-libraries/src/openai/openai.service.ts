@@ -5,7 +5,8 @@ import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-proj-',
+  apiKey: process.env.DEEPSEEK_API_KEY || 'sk-proj-',
+  baseURL: 'https://api.deepseek.com/v1',
 });
 
 const PicturePrompt = z.object({

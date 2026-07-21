@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createReadStream, statSync } from 'fs';
+import { createReadStream, existsSync, statSync } from 'fs';
+import { join } from 'path';
 // @ts-ignore
 import mime from 'mime';
 async function* nodeStreamToIterator(stream: any) {
@@ -28,8 +29,36 @@ export const GET = async (
   }
 ) => {
   const { path } = await context.params;
-  const filePath =
-    process.env.UPLOAD_DIRECTORY + '/' + (path ?? []).join('/');
+  const uploadDirectory = process.env.UPLOAD_DIRECTORY;
+
+  if (!uploadDirectory) {
+    return NextResponse.json(
+      { error: 'UPLOAD_DIRECTORY is not configured on the server.' },
+      { status: 500 }
+    );
+  }
+
+  if (!path?.length) {
+    return NextResponse.json(
+      { error: 'Missing upload file path.' },
+      { status: 400 }
+    );
+  }
+
+  const normalizedUploadDirectory = join(uploadDirectory);
+  const filePath = join(normalizedUploadDirectory, ...path);
+
+  if (!filePath.startsWith(normalizedUploadDirectory)) {
+    return NextResponse.json(
+      { error: 'Invalid upload file path.' },
+      { status: 400 }
+    );
+  }
+
+  if (!existsSync(filePath)) {
+    return NextResponse.json({ error: 'Upload file not found.' }, { status: 404 });
+  }
+
   const response = createReadStream(filePath);
   const fileStats = statSync(filePath);
   const contentType = mime.getType(filePath) || 'application/octet-stream';
@@ -43,7 +72,7 @@ export const GET = async (
       // Set the content-length header
       'Last-Modified': fileStats.mtime.toUTCString(),
       // Set the last-modified header
-      'Cache-Control': 'public, max-age=31536000, immutable', // Example cache-control header
+      'Cache-Control': 'public, max-age=31536000, immutable',
     },
   });
 };

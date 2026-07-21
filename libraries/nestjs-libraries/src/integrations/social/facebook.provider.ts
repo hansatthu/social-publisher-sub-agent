@@ -233,17 +233,24 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
+  private getRedirectUri(refresh?: string) {
+    const useRedirectMeTo =
+      process?.env?.FRONTEND_URL?.indexOf('https') === -1;
+    const redirectBase = useRedirectMeTo ? 'https://redirectmeto.com/' : '';
+    const baseUrl = `${redirectBase}${process.env.FRONTEND_URL}/integrations/social/facebook`;
+    return refresh ? `${baseUrl}?refresh=${encodeURIComponent(refresh)}` : baseUrl;
+  }
+
   async generateAuthUrl() {
     const state = makeId(6);
     return {
       url:
         'https://www.facebook.com/v20.0/dialog/oauth' +
         `?client_id=${process.env.FACEBOOK_APP_ID}` +
-        `&redirect_uri=${encodeURIComponent(
-          `${process.env.FRONTEND_URL}/integrations/social/facebook`
-        )}` +
+        `&redirect_uri=${encodeURIComponent(this.getRedirectUri())}` +
+        `&response_type=code` +
         `&state=${state}` +
-        `&scope=${this.scopes.join(',')}`,
+        `&scope=${encodeURIComponent(this.scopes.join(','))}`,
       codeVerifier: makeId(10),
       state,
     };
@@ -276,11 +283,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       await fetch(
         'https://graph.facebook.com/v20.0/oauth/access_token' +
           `?client_id=${process.env.FACEBOOK_APP_ID}` +
-          `&redirect_uri=${encodeURIComponent(
-            `${process.env.FRONTEND_URL}/integrations/social/facebook${
-              params.refresh ? `?refresh=${params.refresh}` : ''
-            }`
-          )}` +
+          `&redirect_uri=${encodeURIComponent(this.getRedirectUri(params.refresh))}` +
           `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
           `&code=${params.code}`
       )

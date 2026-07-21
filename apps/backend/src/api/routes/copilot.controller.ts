@@ -31,6 +31,60 @@ export type ChannelsContext = {
   ui: string;
 };
 
+/**
+ * Creates a patched OpenAI instance that remaps the unsupported `developer`
+ * role to `system` before forwarding requests to DeepSeek's API.
+ *
+ * CopilotKit's OpenAIAdapter sends `role: "developer"` as the system prompt
+ * (an OpenAI o1/o3-only feature). DeepSeek only accepts:
+ * system | user | assistant | tool | latest_reminder
+ */
+function createDeepSeekClient(): OpenAI {
+  const client = new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    baseURL: 'https://api.deepseek.com/v1',
+  });
+
+  // Patch chat.completions.create to remap 'developer' role -> 'system'
+  const originalCreate = client.chat.completions.create.bind(client.chat.completions);
+  (client.chat.completions as any).create = (params: any, options?: any) => {
+    if (params?.messages && Array.isArray(params.messages)) {
+      params = {
+        ...params,
+        messages: params.messages.map((msg: any) =>
+          msg.role === 'developer' ? { ...msg, role: 'system' } : msg
+        ),
+      };
+    }
+    return originalCreate(params, options);
+  };
+
+  const originalStream = client.chat.completions.stream.bind(client.chat.completions);
+  (client.chat.completions as any).stream = (params: any, options?: any) => {
+    console.log("PATCHED STREAM CALLED! messages count:", params?.messages?.length);
+    if (params?.messages && Array.isArray(params.messages)) {
+      params = {
+        ...params,
+        messages: params.messages.map((msg: any) => {
+          if (msg.role === 'developer') {
+            console.log("REPLACING DEVELOPER ROLE WITH SYSTEM");
+            return { ...msg, role: 'system' };
+          }
+          return msg;
+        }),
+      };
+    }
+    return originalStream(params, options);
+  };
+
+  // CopilotKit uses client.beta.chat which is removed in openai v6
+  (client as any).beta = {
+    chat: client.chat,
+  };
+
+  return client;
+}
+
 @Controller('/copilot')
 export class CopilotController {
   constructor(
@@ -47,7 +101,7 @@ export class CopilotController {
     }
 
     const isDeepseek = !!process.env.DEEPSEEK_API_KEY;
-    const openaiInstance = isDeepseek ? new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com/v1' }) : undefined;
+    const openaiInstance = isDeepseek ? createDeepSeekClient() : undefined;
 
     const copilotRuntimeHandler = copilotRuntimeNodeHttpEndpoint({
       endpoint: '/copilot/chat',
@@ -95,7 +149,7 @@ export class CopilotController {
     });
 
     const isDeepseek = !!process.env.DEEPSEEK_API_KEY;
-    const openaiInstance = isDeepseek ? new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: 'https://api.deepseek.com/v1' }) : undefined;
+    const openaiInstance = isDeepseek ? createDeepSeekClient() : undefined;
 
     const copilotRuntimeHandler = copilotRuntimeNextJSAppRouterEndpoint({
       endpoint: '/copilot/agent',
@@ -104,6 +158,7 @@ export class CopilotController {
       serviceAdapter: new OpenAIAdapter({
         openai: openaiInstance as any,
         model: isDeepseek ? 'deepseek-chat' : 'gpt-4o',
+        keepSystemRole: isDeepseek,
       }),
     });
 

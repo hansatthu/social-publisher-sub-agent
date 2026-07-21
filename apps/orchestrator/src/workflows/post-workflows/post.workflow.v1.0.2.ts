@@ -1,4 +1,4 @@
-import { PostActivity } from '@gitroom/orchestrator/activities/post.activity';
+import { PostActivity } from '../activities/post.activity';
 import {
   ActivityFailure,
   ApplicationFailure,
