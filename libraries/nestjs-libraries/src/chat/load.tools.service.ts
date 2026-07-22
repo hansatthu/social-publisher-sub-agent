@@ -46,6 +46,7 @@ export class LoadToolsService {
     const aiProvider = isDeepseek ? createOpenAI({
       baseURL: 'https://api.deepseek.com/v1',
       apiKey: process.env.DEEPSEEK_API_KEY,
+      compatibility: 'compatible',
     }) : openai;
 
     return new Agent({
